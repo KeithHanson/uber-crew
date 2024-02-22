@@ -1,15 +1,15 @@
 import os
 from crewai import Agent, Task, Crew, Process
 from langchain.tools import tool
-from langchain.chat_models import openai
+from langchain_openai import ChatOpenAI
 
 from duckduckgo_search import DDGS
 
-os.environ["OPENAI_API_BASE"] = os.environ["OPENAI_API_BASE"] || 'http://localhost:11434/v1'
-os.environ["OPENAI_MODEL"] = os.environ["OPENAI_MODEL"] || "eas/nous-hermes-2-solar-10.7b"
-os.environ["OPENAI_API_KEY"] = os.environ["OPENAI_API_KEY"] || 'IGNORED'
+os.environ["OPENAI_API_BASE"] = os.environ["OPENAI_API_BASE"] if "OPENAI_API_BASE" in os.environ else 'http://localhost:11434/v1'
+os.environ["OPENAI_MODEL"] = os.environ["OPENAI_MODEL"] if "OPENAI_MODEL" in os.environ else "eas/nous-hermes-2-solar-10.7b"
+os.environ["OPENAI_API_KEY"] = os.environ["OPENAI_API_KEY"] if "OPENAI_API_KEY" in os.environ else 'IGNORED'
 
-llm=openai.ChatOpenAI(base_url=os.environ["OPENAI_API_BASE"], api_key=os.environ["OPENAI_API_KEY"], model=os.environ["OPENAI_MODEL"])
+llm=ChatOpenAI(base_url=os.environ["OPENAI_API_BASE"], api_key=os.environ["OPENAI_API_KEY"], model=os.environ["OPENAI_MODEL"])
 
 class DDGTools():
 
@@ -60,7 +60,7 @@ researcher = Agent(
 task1 = Task(
   description="""Conduct a comprehensive analysis of the latest advancements in AI in 2024.
   Identify key trends, breakthrough technologies, and potential industry impacts.
-  Your final answer MUST be a full analysis report""",
+  Your final answer MUST be short 100 word article summarizing the findings.""",
   agent=researcher
 )
 
@@ -69,6 +69,8 @@ crew = Crew(
   agents=[researcher],
   tasks=[task1],
   verbose=True, # You can set it to 1 or 2 to different logging levels
+  process=Process.hierarchical,
+  manager_llm=llm
 )
 
 result = crew.kickoff()
