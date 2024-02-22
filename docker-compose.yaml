@@ -16,9 +16,9 @@ services:
   agent:
     build: crew/
     environment:
-      - OPENAI_API_BASE=http://host_llm:11434/v1
-      - OPENAI_MODEL=eas/nous-hermes-2-solar-10.7b
-      - OPENAI_API_KEY=IGNORED
+      - OPENAI_API_BASE=${OPENAI_API_BASE}
+      - OPENAI_MODEL=${OPENAI_MODEL}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     links:
       - firefox
     extra_hosts:
